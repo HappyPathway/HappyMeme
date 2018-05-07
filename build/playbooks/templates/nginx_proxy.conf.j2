@@ -1,0 +1,14 @@
+<%$version := key "services/app/proxy/version" %>
+<% key "services/app/proxy/version" %>
+<%$node_id := printf "%s.app@dc1" $version %>
+
+server {
+    listen 80;
+    server_name {{ proxy_name }};
+
+    <% with node $node_id %>
+    location / {
+        proxy_pass http://<% .Address %>:<% key "services/app/proxy/port" %>
+    }
+    <% end %>
+}

@@ -1,0 +1,13 @@
+{
+  "datacenter": "{{ consul_cluster }}",
+  "data_dir": "/opt/consul",
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "log_level": "INFO",
+  "node_name": "{{ ansible_hostname }}",
+  {% if consul_acl %}
+  "acl_datacenter": "{{ consul_acl_cluster }}",
+  "acl_token": "{{ consul_token }}",
+  {% endif %}
+  "retry_join": ["{{ consul_cluster_addr }}"]
+}

@@ -1,0 +1,15 @@
+{
+  "service": {
+    "name": "{{ service_name }}.{{ env }}",
+    "tags": ["{{ service_name }}", "{{ env }}"],
+    "address": "{{ ansible_default_ipv4.address }}",
+    "port": {{ service_port }},
+    "enableTagOverride": false,
+    "checks": [
+      {
+        "tcp": "{{ ansible_default_ipv4.address }}:{{ service_port }}",
+        "interval": "10s"
+      }
+    ]
+  }
+}

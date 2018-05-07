@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+    - name: install nginx
+      apt: name=nginx state=installed update_cache=yes
+    
+    - name: set index.html
+      template: src=index.html.j2 dest=/var/www/html/index.html
+
+    - name: mv images
+      shell: mv /tmp/images /var/www/html/

@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.define "proxy" do |proxy|
+    proxy.vm.network "forwarded_port", guest: 80, host: 8080
+    proxy.vm.provision "file", source: "../dev/images", destination: "/tmp/images"
+    proxy.vm.provision "file", source: "../build/playbooks", destination: "/tmp/playbooks"
+    proxy.vm.provision  "shell", inline: "echo #{ENV['color']} > /tmp/color"
+    proxy.vm.provision "shell", path: "proxy_bootstrap.sh"
+  end
+  config.vm.define "app" do |app|
+    app.vm.network "forwarded_port", guest: 80, host: 8081
+    app.vm.provision "file", source: "../dev/images", destination: "/tmp/images"
+    app.vm.provision "file", source: "../build/playbooks", destination: "/tmp/playbooks"
+    app.vm.provision  "shell", inline: "echo #{ENV['color']} > /tmp/color"
+    app.vm.provision "shell", path: "app_bootstrap.sh"
+  end
+end
