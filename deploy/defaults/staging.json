@@ -1,0 +1,11 @@
+{
+    "services/staging/app/ami":"ami-43a15f3e",
+    "services/staging/app/dns_zone":"Z14Q4HNSAERQT2",
+    "services/staging/app/dns_name":"ops.happypathway.com.",
+    "services/staging/app/instance_type":"t2.small",
+    "services/staging/app/instance_user":"ubuntu",
+    "services/staging/app/key_pair":"id_rsa",
+    "services/staging/app/security_group":"sg-dc2dc794",
+    "services/staging/app/subnet_id":"subnet-a9915286",
+    "services/staging/app/private_zone":false
+}

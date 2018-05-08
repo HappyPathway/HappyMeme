@@ -4,8 +4,8 @@
     - name: install nginx
       apt: name=nginx state=installed update_cache=yes
     
-    - name: set index.html
-      template: src=index.html.j2 dest=/var/www/html/index.html
-
-    - name: mv images
-      shell: mv /tmp/images /var/www/html/
+    - name: remove default root
+      file: path=/var/www/html state=absent
+      
+    - name: install app
+      shell: mv /tmp/app /var/www/html

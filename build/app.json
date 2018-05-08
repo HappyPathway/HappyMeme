@@ -1,66 +1,55 @@
 {
-  "min_packer_version": "0.12.0",
-  "variables": {
-    "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
-    "tenant_id": "{{env `ARM_TENANT_ID`}}",
-    "client_id": "{{env `ARM_CLIENT_ID`}}",
-    "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
-    "azure_location": "West US 2",
-    "resource_group_name": "{{env `RESOURCE_GROUP_NAME`}}",
-    "service": "",
-    "version": "",
-    "color": ""
-  },
-  "builders": [
-    {
-      "type": "azure-arm",
-      "subscription_id": "{{user `subscription_id`}}",
-      "tenant_id": "{{user `tenant_id`}}",
-      "client_id": "{{user `client_id`}}",
-      "client_secret": "{{user `client_secret`}}",
-      "managed_image_name": "{{user `service`}}-{{isotime \"2006-01-02-150405\"}}",
-      "managed_image_resource_group_name": "{{user `resource_group_name`}}",
-      "os_type": "Linux",
-      "image_publisher": "Canonical",
-      "image_offer": "UbuntuServer",
-      "image_sku": "16.04.0-LTS",
-      "location": "{{user `azure_location`}}",
-      "vm_size": "Standard_DS2_v2",
-      "azure_tags": {
-        "version": "{{ user `version`}}",
-        "service": "{{ user `service`}}"
-      }
-    }
-  ],
-  "provisioners": [
-    {
-      "type": "file",
-      "source": "../dev/images",
-      "destination": "/tmp/images"
+    "variables":{
+        "source_ami":"ami-43a15f3e",
+        "service_name":"",
+        "home_dir":"{{env `HOME`}}",
+        "instance_type":"m4.large",
+        "working_dir":"{{env `PWD`}}",
+        "version":"1.0.0",
+        "env":"staging"
     },
-    {
-      "type": "file",
-      "source": "playbooks",
-      "destination": "/tmp/playbooks"
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo apt-get update",
-        "sudo apt-get install -y python-pip",
-        "sudo pip install -r /tmp/playbooks/requirements.txt",
-        "sudo ansible-playbook /tmp/playbooks/install.yaml -e color={{user `color`}}",
-        "sudo rm -rf /tmp/playbooks"
-      ]
-    },
-    {
-      "type": "shell",
-      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
-      "inline": [
-        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
-      ],
-      "inline_shebang": "/bin/sh -x",
-      "pause_before": "30s"
-    }
-  ]
+    
+    "builders":[
+        {
+            "source_ami":"{{user `source_ami`}}",
+            "tags":{
+                "version":"{{user `version`}}",
+                "service":"{{user `service_name`}}"
+            },
+            "ssh_username":"ubuntu",
+            "region":"us-east-1",
+            "ami_name":"{{user `service_name`}}-{{user `version`}}",
+            "ami_groups":"all",
+            "instance_type":"{{user `instance_type`}}",
+            "run_tags":{
+                "Name":"Packer-{{user `service_name`}}-{{user `version`}}"
+            },
+            "force_deregister":true,
+            "force_delete_snapshot":true,
+            "type":"amazon-ebs"
+        }
+    ],
+
+    "provisioners":[
+        {
+            "source":"../dev",
+            "destination":"/tmp/app",
+            "type":"file"
+        },
+        {
+            "source":"playbooks",
+            "destination":"/tmp/playbooks",
+            "type":"file"
+        },
+        {
+            "inline":[
+                "sudo apt-get update",
+                "sudo apt-get install -y python-pip",
+                "sudo pip install -r /tmp/playbooks/requirements.txt",
+                "sudo ansible-playbook /tmp/playbooks/app_install.yaml",
+                "sudo rm -rf /tmp/playbooks"
+            ],
+            "type":"shell"
+        }
+    ]
 }
